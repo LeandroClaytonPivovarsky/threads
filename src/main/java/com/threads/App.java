@@ -11,52 +11,50 @@ public class App
     private static ThreadHub threadHub;
     public static void main( String[] args )
     {
-        Scanner reader = new Scanner(System.in);
-        
-        boolean continuar = true;
-        threadHub = new ThreadHub();
-        threadHub.start();
-    
-
-        while (continuar) {
-            System.out.println("\n\n\nType something and press enter to get one of the actions");
-            reader.next();
-
-            threadHub.allThreadsInterruptor();
+        try (Scanner reader = new Scanner(System.in)) {
+            boolean continuar = true;
+            threadHub = new ThreadHub();
+            threadHub.start();
             
-            System.out.println("Your answer: \n");
-            String input = reader.next();
-            while (input.isEmpty() || input.isBlank()) {
-                System.out.println("None answer found, please try again");
-                input = reader.next();
-            }
-            if (input.equalsIgnoreCase("leave")) {
-                threadHub.kill();
-                continuar = false;
-            } else {
-                choices(input, reader);
+            
+            while (continuar) {
 
-            }
-            if (!threadHub.wasNotKilled()) {
-                System.out.println("Thread Hub isn't alive, the program will be shut downed!\nGoodbye! :)");
                 reader.next();
-                try {
-                    threadHub.join();
-                } catch (InterruptedException ex) {
-                    System.err.println(ex.getMessage());
+                
+                threadHub.allThreadsInterruptor();
+                
+                System.out.println("Your answer: \n");
+                String input = reader.next();
+                while (input.isEmpty() || input.isBlank()) {
+                    System.out.println("None answer found, please try again");
+                    input = reader.next();
                 }
-            } else{
-                threadHub.printInterface();
+                if (input.equalsIgnoreCase("leave")) {
+                    threadHub.kill();
+                    continuar = false;
+                } else {
+                    choices(input, reader);
+                    
+                }
+                if (!threadHub.wasNotKilled()) {
+                    System.out.println("Thread Hub isn't alive, the program will be shut downed!\nGoodbye! :)");
+                    reader.next();
+                    try {
+                        threadHub.join();
+                    } catch (InterruptedException ex) {
+                        System.err.println(ex.getMessage());
+                    }
+                } else{
+                    threadHub.printInterface();
+                }
+                
+                
             }
-            reader.close();
-            
         }
-
-
     }
 
 
-    private static void choices  (String input, Scanner reader){
+    private static void choices(String input, Scanner reader){
 
         input = input.toUpperCase();
         switch (input) {
@@ -67,7 +65,7 @@ public class App
                 if (choiceString.equalsIgnoreCase("all")) {
                     threadHub.killAllThreads();
 
-                    System.out.println("All threads have been killed!(type something and you go to principal menu)");
+                    System.out.println("All threads have been killed!(type something and press enter to go for principal menu)");
                     reader.next();
                 }else if (choiceString.equalsIgnoreCase("one")) {
                     if (!threadHub.listAllThreads()) {
@@ -91,7 +89,8 @@ public class App
         
             case "ADD":
                 threadHub.addThread();
-                System.out.println("Thread adicionada com sucesso!");
+                System.out.println("Thread added with success!");
+                threadHub.interruptOneThread(threadHub.howManyThreads());
                 break;
         }
         threadHub.allThreadsStarter();

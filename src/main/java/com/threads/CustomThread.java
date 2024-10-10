@@ -63,7 +63,7 @@ public class CustomThread extends Thread {
 
     @Override
     public String toString() {
-        return "["+ customId +"] Thread " + customId;
+        return  "Thread " + customId;
 
     };
 

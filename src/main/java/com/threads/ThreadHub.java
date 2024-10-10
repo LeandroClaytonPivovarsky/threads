@@ -1,5 +1,6 @@
 package com.threads;
 
+import java.time.Duration;
 import java.util.ArrayList;
 
 
@@ -31,39 +32,23 @@ public class ThreadHub extends Thread{
     }
 
     public boolean killOneThread(int id){
-        int i = 0;
         if (id-1 > threads.size() || id-1 < 0 || threads.isEmpty()) {
             return false;
         }
 
-        while (threads.size() > i) {
-
-            if (threads.get(i).getCustomId() == id) {
-                sortIdThreads(id);
-                threads.remove(i);
-                return true;
-            }
-
-            i++;
-        }
-
-        return false;
+        threads.remove(id-1);
+        return true;
         
     }
-
-    private void sortIdThreads(int index){
-
-        for (int i = index-1; i < threads.size(); i++) {
-            threads.get(i).setCustomId(i);
-        }
-    }
-
     public boolean listAllThreads(){
+        int i = 1;
         if (threads.isEmpty()) {
             return false;
         }
         for (CustomThread customThread : threads) {
-            System.out.println(customThread.toString());
+            
+            System.out.println("["+ i +"]" + customThread.toString());
+            i++;
         }
         return true;
     }
@@ -73,7 +58,7 @@ public class ThreadHub extends Thread{
         if (threads.isEmpty()) {
             customThread = new CustomThread(1);
         } else{
-            customThread = new CustomThread(threads.size() + 1);
+            customThread = new CustomThread(threads.get(threads.size()-1).getCustomId()+1 );
         }
 
         threads.add(customThread);
@@ -97,6 +82,7 @@ public class ThreadHub extends Thread{
         String text = "Thread hub started!\nTo create a new thread please type \"add\"\nTo stop all threads, type: \" kill all\", and only one type: \"Kill one Thread\"\nTo list all threads alive, type: \"List\"\nTo stop the program type: \"Leave\"";
 
         System.out.println(text);
+        System.out.println("\n\n\nType something and press enter to get one of the actions");
     }
 
     public void allThreadsInterruptor(){
@@ -105,19 +91,35 @@ public class ThreadHub extends Thread{
             return;
         }
         for (CustomThread customThread : threads) {
-            System.out.println("Parando a thread " + customThread.getCustomId() + " para a resposta!");
+            System.out.println("Stoping thread " + customThread.getCustomId() + " for the answer!");
             customThread.pauseThread();
+            
         }
     }
 
+    public void interruptOneThread(int id){
+        threads.get(id-1).pauseThread();
+    }
+
+
+
     public void allThreadsStarter(){
-        if (threads.size() == 1) {
+        if (threads.isEmpty()) {
             return;
         }
-        System.out.println("Reiniciando as threads...");
+        
 
         for (CustomThread customThread : threads) {
-            customThread.resumeThread();
+            try {
+                System.out.println("Restarting thread "+ customThread.getCustomId() +"...");
+                sleep(Duration.ofSeconds(2));
+                customThread.resumeThread();
+                System.out.println("Thread " + customThread.getCustomId() + " resumed!");
+
+                sleep(Duration.ofSeconds(2));
+            } catch (InterruptedException e) {
+                System.err.println(e.getMessage());
+            }
         }
 
     }
