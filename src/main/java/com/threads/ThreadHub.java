@@ -18,7 +18,8 @@ public class ThreadHub extends Thread{
     public void run() {
         printInterface();
 
-        while (alive){}
+        while (alive){
+        }
     }
 
     public void kill() {
@@ -93,26 +94,19 @@ public class ThreadHub extends Thread{
 
     public void printInterface(){
         
-        String text = "Thread hub started!\nTo create a new thread please type \"add\"\nTo stop all threads, type: \" kill all\", and only one type: \"Kill one Thread\"\nTo list all threads alive, type: \"List\"";
+        String text = "Thread hub started!\nTo create a new thread please type \"add\"\nTo stop all threads, type: \" kill all\", and only one type: \"Kill one Thread\"\nTo list all threads alive, type: \"List\"\nTo stop the program type: \"Leave\"";
 
         System.out.println(text);
     }
 
     public void allThreadsInterruptor(){
+
         if (threads.isEmpty()) {
             return;
         }
         for (CustomThread customThread : threads) {
             System.out.println("Parando a thread " + customThread.getCustomId() + " para a resposta!");
-
-            synchronized(){
-                try {
-                    customThread.wait();
-                } catch (InterruptedException e) {
-                    System.err.println(e.getMessage());
-                }
-            }
-
+            customThread.pauseThread();
         }
     }
 
@@ -122,11 +116,21 @@ public class ThreadHub extends Thread{
         }
         System.out.println("Reiniciando as threads...");
 
-        synchronized(this){
-            notifyAll();
+        for (CustomThread customThread : threads) {
+            customThread.resumeThread();
         }
-        
 
+    }
+
+    public void killAllThreads() {
+        for (CustomThread customThread : threads) {
+            customThread.kill();
+        }
+        threads.clear();
+    }
+
+    public boolean wasNotKilled() {
+        return alive;
     }
     
 }
